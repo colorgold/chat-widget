@@ -1,0 +1,53 @@
+// Add to firebase realtime database rules
+
+{
+  "rules": {
+    "rooms": {
+      "$roomId": {
+        "presence": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+        "lastSent": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.val() === now && (!data.exists() || now - data.val() >= 2000)"
+          }
+        },
+        "messages": {
+          ".read": "auth != null",
+          ".indexOn": ["createdAt"],
+          "$messageId": {
+            ".write": "auth != null && !data.exists() && newData.exists()",
+            ".validate": "newData.hasChildren(['uid', 'username', 'type', 'createdAt']) && newData.child('uid').val() === auth.uid && newData.child('username').isString() && newData.child('username').val().length > 0 && newData.child('username').val().length <= 30 && newData.child('createdAt').val() === now && root.child('rooms/' + $roomId + '/lastSent/' + auth.uid).val() === now && ((newData.child('type').val() === 'text' && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 500 && !newData.hasChild('mediaUrl')) || ((newData.child('type').val() === 'sticker' || newData.child('type').val() === 'gif') && newData.child('mediaUrl').isString() && newData.child('mediaUrl').val().beginsWith('https://') && newData.child('mediaUrl').val().length <= 300 && (!newData.hasChild('text') || (newData.child('text').isString() && newData.child('text').val().length <= 500))))"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// embed widget
+<public-chat-widget 
+  room-id="general"
+  firebase-config='{"apiKey":"...","authDomain":"...","databaseURL":"...","projectId":"..."}'
+  tenor-api-key="OPTIONAL_TENOR_OR_GIPHY_KEY"
+  stickers='["https://your-cdn.com", "https://your-cdn.com"]'>
+</public-chat-widget>
+
+// override style
+<style>
+  public-chat-widget {
+    --chat-primary: #8b5cf6;
+    --chat-bg: #18181b;
+    --chat-header-bg: #09090b;
+    --chat-border: #27272a;
+    --chat-other-msg-bg: #27272a;
+    --chat-other-msg-text: #f4f4f5;
+    --chat-input-bg: #18181b;
+    --chat-input-text: #ffffff;
+  }
+</style>
