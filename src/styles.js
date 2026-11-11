@@ -1,6 +1,6 @@
 export const WIDGET_STYLES = `
   :host {
-    --chat-width: 320px;
+    --chat-width: 100%;
     --chat-height: 440px;
     --chat-font: system-ui, -apple-system, sans-serif;
     --chat-bg: #ffffff;
@@ -17,15 +17,24 @@ export const WIDGET_STYLES = `
     --chat-input-bg: #ffffff;
     --chat-input-text: #111111;
     --chat-drawer-bg: #f9f9f9;
+
+    display: block;
+    width: var(--chat-width);
+    height: var(--chat-height);
+    font-family: var(--chat-font);
+    box-sizing: border-box;
+  }
+    // Styles for floating chat widget
+  :host([floating]) {
+    --chat-width: 320px;
     position: fixed;
     bottom: 20px;
     right: 20px;
-    font-family: var(--chat-font);
     z-index: 9999;
   }
   #box {
-    width: var(--chat-width);
-    height: var(--chat-height);
+    width: 100%;
+    height: 100%;
     border: 1px solid var(--chat-border);
     background: var(--chat-bg);
     display: flex;
@@ -34,6 +43,7 @@ export const WIDGET_STYLES = `
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     position: relative;
+    box-sizing: border-box;
   }
   #header {
     padding: 10px;

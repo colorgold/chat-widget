@@ -10,6 +10,7 @@ import {
   query,
   limitToLast,
   serverTimestamp,
+  update,
 } from "firebase/database";
 
 export class ChatFirebaseService {
@@ -68,11 +69,8 @@ export class ChatFirebaseService {
     if (type === "text" && !cleanText) return;
     if ((type === "sticker" || type === "gif") && !mediaUrl) return;
 
-    const messagesRef = ref(this.db, `rooms/${this.roomId}/messages`);
-    const lastSentRef = ref(
-      this.db,
-      `rooms/${this.roomId}/lastSent/${this.userId}`,
-    );
+    // Generate a unique message ID locally first
+    const newMsgKey = push(ref(this.db, `rooms/${this.roomId}/messages`)).key;
 
     const payload = {
       uid: this.userId,
@@ -84,7 +82,11 @@ export class ChatFirebaseService {
     if (cleanText) payload.text = cleanText;
     if (mediaUrl) payload.mediaUrl = mediaUrl;
 
-    await set(lastSentRef, serverTimestamp());
-    await push(messagesRef, payload);
+    // Write both lastSent and the message in ONE atomic request so `now` matches
+    const updates = {};
+    updates[`rooms/${this.roomId}/lastSent/${this.userId}`] = serverTimestamp();
+    updates[`rooms/${this.roomId}/messages/${newMsgKey}`] = payload;
+
+    await update(ref(this.db), updates);
   }
 }
