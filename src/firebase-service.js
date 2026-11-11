@@ -69,7 +69,7 @@ export class ChatFirebaseService {
     if (type === "text" && !cleanText) return;
     if ((type === "sticker" || type === "gif") && !mediaUrl) return;
 
-    // Generate a unique message ID locally first
+    const roomRef = ref(this.db, `rooms/${this.roomId}`);
     const newMsgKey = push(ref(this.db, `rooms/${this.roomId}/messages`)).key;
 
     const payload = {
@@ -82,11 +82,10 @@ export class ChatFirebaseService {
     if (cleanText) payload.text = cleanText;
     if (mediaUrl) payload.mediaUrl = mediaUrl;
 
-    // Write both lastSent and the message in ONE atomic request so `now` matches
     const updates = {};
-    updates[`rooms/${this.roomId}/lastSent/${this.userId}`] = serverTimestamp();
-    updates[`rooms/${this.roomId}/messages/${newMsgKey}`] = payload;
+    updates[`lastSent/${this.userId}`] = serverTimestamp();
+    updates[`messages/${newMsgKey}`] = payload;
 
-    await update(ref(this.db), updates);
+    await update(roomRef, updates);
   }
 }
