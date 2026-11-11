@@ -109,8 +109,11 @@ class PublicChatWidget extends HTMLElement {
   renderTabContent() {
     const body = this.shadowRoot.querySelector("#picker-body");
     const gifSearchWrap = this.shadowRoot.querySelector("#gif-search-wrap");
+    const hasGifKey = Boolean(this.giphyKey || this.tenorKey);
+
     body.innerHTML = "";
-    gifSearchWrap.style.display = this.activeTab === "gif" ? "block" : "none";
+    gifSearchWrap.style.display =
+      this.activeTab === "gif" && hasGifKey ? "block" : "none";
 
     if (this.activeTab === "emoji") {
       const grid = document.createElement("div");
@@ -140,8 +143,8 @@ class PublicChatWidget extends HTMLElement {
       });
       body.appendChild(grid);
     } else if (this.activeTab === "gif") {
-      if (!this.giphyKey && !this.tenorKey) {
-        body.innerHTML = `<div class="empty-msg">Add a <code>giphy-api-key</code> or <code>tenor-api-key</code> attribute to enable GIF search.</div>`;
+      if (!hasGifKey) {
+        body.innerHTML = `<div class="empty-msg">Add a <code>giphy-api-key</code> attribute to enable GIF search.</div>`;
         return;
       }
       const queryInput = this.shadowRoot.querySelector("#gif-search");
@@ -264,11 +267,21 @@ class PublicChatWidget extends HTMLElement {
     });
 
     const gifSearch = this.shadowRoot.querySelector("#gif-search");
-    gifSearch.addEventListener("input", (e) => {
+    const triggerGifSearch = () => {
+      if (!this.giphyKey && !this.tenorKey) return;
       clearTimeout(this.gifSearchTimer);
       this.gifSearchTimer = setTimeout(() => {
-        this.loadGifs(e.target.value.trim());
+        this.loadGifs(gifSearch.value.trim());
       }, 350);
+    };
+
+    gifSearch.addEventListener("input", triggerGifSearch);
+    gifSearch.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        clearTimeout(this.gifSearchTimer);
+        this.loadGifs(gifSearch.value.trim());
+      }
     });
 
     const form = this.shadowRoot.querySelector("#chat-form");
