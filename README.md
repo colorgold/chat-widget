@@ -31,9 +31,39 @@ Add the jsDelivr CDN script and the `<public-chat-widget>` tag to your HTML:
 ```
 
 ---
+## Live Language Switching
 - lang: Built-in language code ("en" or "es").
 - i18n: Either a path/URL to a custom .json translation file (e.g., i18n="./locales/fr.json") or an inline JSON string of key overrides
 
+By default the widget has English and Spanish built in. Add the following code:
+
+```window.addEventListener("app:lang-changed", (e) => {
+    const widget = document.querySelector("public-chat-widget");
+    console.log("Language changed to:", e.detail.language);
+    if (widget) {
+      console.log("Updating chat widget language to:", e.detail.language);
+      widget.setAttribute("lang", e.detail.language);
+    }
+  });
+```
+
+If you provide "i18n" attribute for your own custom translation file, add this:
+
+```window.addEventListener("app:lang-changed", (e) => {
+  const widget = document.querySelector("public-chat-widget");
+  if (!widget) return;
+
+  const newLang = e.detail.language;
+  widget.setAttribute("lang", newLang);
+
+  if (newLang === "es") {
+    widget.setAttribute("i18n", "locales/es/chatWidget.json");
+  } else {
+    // Removing i18n lets the widget fall back to its built-in English strings
+    widget.removeAttribute("i18n");
+  }
+});
+```
 ## 2. Firebase Setup (Required)
 
 1. Create a free project in the [Firebase Console](https://google.com).
