@@ -31,6 +31,8 @@ Add the jsDelivr CDN script and the `<public-chat-widget>` tag to your HTML:
 ```
 
 ---
+- lang: Built-in language code ("en" or "es").
+- i18n: Either a path/URL to a custom .json translation file (e.g., i18n="./locales/fr.json") or an inline JSON string of key overrides
 
 ## 2. Firebase Setup (Required)
 
