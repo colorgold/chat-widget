@@ -1,8 +1,11 @@
 import { WIDGET_STYLES } from "./styles.js";
 import { DEFAULT_EMOJIS, DEFAULT_STICKERS, searchGifs } from "./media-api.js";
 import { ChatFirebaseService } from "./firebase-service.js";
-
+import { resolveTranslations } from "./i18n.js";
 class PublicChatWidget extends HTMLElement {
+  static get observedAttributes() {
+    return ["lang", "i18n"];
+  }
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -12,6 +15,20 @@ class PublicChatWidget extends HTMLElement {
     this.activeTab = "emoji";
     this.drawerOpen = false;
     this.gifSearchTimer = null;
+    this.onlineCount = 1;
+    this.t = resolveTranslations();
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      this.t = resolveTranslations(
+        this.getAttribute("lang") || "en",
+        this.getAttribute("i18n"),
+      );
+      if (this.shadowRoot.innerHTML) {
+        this.applyTranslations();
+      }
+    }
   }
 
   async connectedCallback() {
@@ -20,6 +37,11 @@ class PublicChatWidget extends HTMLElement {
       console.error("PublicChatWidget: Missing firebase-config attribute.");
       return;
     }
+
+    this.t = resolveTranslations(
+      this.getAttribute("lang") || "en",
+      this.getAttribute("i18n"),
+    );
 
     const firebaseConfig = JSON.parse(rawConfig);
     this.roomId = this.getAttribute("room-id") || "general";
@@ -37,13 +59,36 @@ class PublicChatWidget extends HTMLElement {
     await this.service.connect();
 
     this.service.watchPresence((count) => {
-      const badge = this.shadowRoot.querySelector("#online-count");
-      if (badge) badge.textContent = `${count} online`;
+      this.onlineCount = count;
+      this.updateOnlineBadge();
     });
 
     this.service.watchMessages((messages) => this.renderMessages(messages));
   }
 
+  updateOnlineBadge() {
+    const badge = this.shadowRoot.querySelector("#online-count");
+    if (badge) {
+      badge.textContent = this.t.online.replace("{count}", this.onlineCount);
+    }
+  }
+  applyTranslations() {
+    this.updateOnlineBadge();
+    this.shadowRoot.querySelector("#name-input").title = this.t.editNameTitle;
+    this.shadowRoot.querySelector('[data-tab="emoji"]').textContent =
+      this.t.emojisTab;
+    this.shadowRoot.querySelector('[data-tab="sticker"]').textContent =
+      this.t.stickersTab;
+    this.shadowRoot.querySelector('[data-tab="gif"]').textContent =
+      this.t.gifsTab;
+    this.shadowRoot.querySelector("#gif-search").placeholder =
+      this.t.searchGifsPlaceholder;
+    this.shadowRoot.querySelector("#picker-toggle").title = this.t.pickerTitle;
+    this.shadowRoot.querySelector("#msg-input").placeholder =
+      this.t.inputPlaceholder;
+    this.shadowRoot.querySelector("#send-btn").textContent = this.t.sendButton;
+    if (this.drawerOpen) this.renderTabContent();
+  }
   renderMessages(messages) {
     const list = this.shadowRoot.querySelector("#messages");
     list.innerHTML = "";
@@ -144,7 +189,10 @@ class PublicChatWidget extends HTMLElement {
       body.appendChild(grid);
     } else if (this.activeTab === "gif") {
       if (!hasGifKey) {
-        body.innerHTML = `<div class="empty-msg">Add a <code>giphy-api-key</code> attribute to enable GIF search.</div>`;
+        const empty = document.createElement("div");
+        empty.className = "empty-msg";
+        empty.textContent = this.t.missingGifKey;
+        body.appendChild(empty);
         return;
       }
       const queryInput = this.shadowRoot.querySelector("#gif-search");
@@ -175,13 +223,17 @@ class PublicChatWidget extends HTMLElement {
         mediaUrl,
       });
     } catch (err) {
-      alert("Please wait a moment before sending another message.");
+      alert(this.t.rateLimitAlert);
     }
   }
 
   async loadGifs(searchTerm = "") {
     const body = this.shadowRoot.querySelector("#picker-body");
-    body.innerHTML = `<div class="empty-msg">Loading GIFs...</div>`;
+    body.innerHTML = "";
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "empty-msg";
+    loadingDiv.textContent = this.t.loadingGifs;
+    body.appendChild(loadingDiv);
 
     try {
       const urls = await searchGifs({
@@ -192,7 +244,10 @@ class PublicChatWidget extends HTMLElement {
 
       body.innerHTML = "";
       if (!urls.length) {
-        body.innerHTML = `<div class="empty-msg">No GIFs found.</div>`;
+        const emptyDiv = document.createElement("div");
+        emptyDiv.className = "empty-msg";
+        emptyDiv.textContent = this.t.noGifsFound;
+        body.appendChild(emptyDiv);
         return;
       }
 
@@ -211,7 +266,11 @@ class PublicChatWidget extends HTMLElement {
       });
       body.appendChild(grid);
     } catch (e) {
-      body.innerHTML = `<div class="empty-msg">Could not load GIFs.</div>`;
+      body.innerHTML = "";
+      const errDiv = document.createElement("div");
+      errDiv.className = "empty-msg";
+      errDiv.textContent = this.t.gifError;
+      body.appendChild(errDiv);
     }
   }
 
@@ -227,27 +286,27 @@ class PublicChatWidget extends HTMLElement {
       <div id="box">
         <div id="header">
           <span><strong>${this.escapeHTML(this.roomId)}</strong></span>
-          <span id="online-count">1 online</span>
-          <input id="name-input" value="${this.escapeHTML(this.username)}" title="Click to edit name" />
+          <span id="online-count">${this.escapeHTML(this.t.online.replace("{count}", this.onlineCount))}</span>
+          <input id="name-input" value="${this.escapeHTML(this.username)}" title="${this.escapeHTML(this.t.editNameTitle)}" />
         </div>
         <div id="messages"></div>
 
         <div id="picker-drawer">
           <div id="picker-tabs">
-            <button type="button" class="tab-btn active" data-tab="emoji">Emojis</button>
-            <button type="button" class="tab-btn" data-tab="sticker">Stickers</button>
-            <button type="button" class="tab-btn" data-tab="gif">GIFs</button>
+            <button type="button" class="tab-btn active" data-tab="emoji">${this.escapeHTML(this.t.emojisTab)}</button>
+            <button type="button" class="tab-btn" data-tab="sticker">${this.escapeHTML(this.t.stickersTab)}</button>
+            <button type="button" class="tab-btn" data-tab="gif">${this.escapeHTML(this.t.gifsTab)}</button>
           </div>
           <div id="gif-search-wrap">
-            <input id="gif-search" type="search" placeholder="Search GIFs..." />
+            <input id="gif-search" type="search" placeholder="${this.escapeHTML(this.t.searchGifsPlaceholder)}" />
           </div>
           <div id="picker-body"></div>
         </div>
 
         <form id="chat-form">
-          <button type="button" id="picker-toggle" title="Emojis, Stickers & GIFs">😊</button>
-          <input id="msg-input" type="text" placeholder="Say something..." maxlength="500" />
-          <button id="send-btn" type="submit">Send</button>
+          <button type="button" id="picker-toggle" title="${this.escapeHTML(this.t.pickerTitle)}">😊</button>
+          <input id="msg-input" type="text" placeholder="${this.escapeHTML(this.t.inputPlaceholder)}" maxlength="500" />
+          <button id="send-btn" type="submit">${this.escapeHTML(this.t.sendButton)}</button>
         </form>
       </div>
     `;
@@ -299,7 +358,7 @@ class PublicChatWidget extends HTMLElement {
           type: "text",
         });
       } catch (err) {
-        alert("Please wait a moment before sending another message.");
+        alert(this.t.rateLimitAlert);
       }
     });
   }
