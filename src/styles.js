@@ -117,8 +117,19 @@ export const WIDGET_STYLES = `
     height: 195px;
     background: var(--chat-drawer-bg);
     border-top: 1px solid var(--chat-border);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
+
+    /* Overlay above the input bar without resizing #box */
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 41px;
+    z-index: 20;
   }
-  #picker-drawer.open { display: flex; }
+
+  #picker-drawer.open {
+    display: flex;
+  }
   #picker-tabs {
     display: flex;
     border-bottom: 1px solid var(--chat-border);
@@ -207,8 +218,12 @@ export const WIDGET_STYLES = `
   form {
     display: flex;
     align-items: center;
+    height: 41px;
+    box-sizing: border-box;
     border-top: 1px solid var(--chat-border);
     background: var(--chat-input-bg);
+    position: relative;
+    z-index: 21;
   }
   #picker-toggle {
     background: transparent;
