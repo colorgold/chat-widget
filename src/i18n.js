@@ -33,17 +33,28 @@ export const BUILTIN_LOCALES = {
   },
 };
 
-export function resolveTranslations(lang = "en", customJson = null) {
+export async function resolveTranslations(lang = "en", i18nAttr = null) {
   const shortLang = (lang || "en").slice(0, 2).toLowerCase();
   const base = BUILTIN_LOCALES[shortLang] || BUILTIN_LOCALES.en;
 
-  if (!customJson) return { ...BUILTIN_LOCALES.en, ...base };
+  if (!i18nAttr) return { ...BUILTIN_LOCALES.en, ...base };
+
+  const trimmed = i18nAttr.trim();
 
   try {
-    const custom = JSON.parse(customJson);
+    // Case 1: Inline JSON string (e.g. i18n='{"sendButton":"Envoyer"}')
+    if (trimmed.startsWith("{")) {
+      const custom = JSON.parse(trimmed);
+      return { ...BUILTIN_LOCALES.en, ...base, ...custom };
+    }
+
+    // Case 2: External JSON file path or URL (e.g. i18n="./locales/fr.json")
+    const response = await fetch(trimmed);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const custom = await response.json();
     return { ...BUILTIN_LOCALES.en, ...base, ...custom };
-  } catch {
-    console.warn("PublicChatWidget: Invalid JSON in 'i18n' attribute.");
+  } catch (err) {
+    console.warn("PublicChatWidget: Could not load 'i18n' value:", err);
     return { ...BUILTIN_LOCALES.en, ...base };
   }
 }

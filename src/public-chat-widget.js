@@ -19,9 +19,9 @@ class PublicChatWidget extends HTMLElement {
     this.t = resolveTranslations();
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  async attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue) {
-      this.t = resolveTranslations(
+      this.t = await resolveTranslations(
         this.getAttribute("lang") || "en",
         this.getAttribute("i18n"),
       );
@@ -38,7 +38,7 @@ class PublicChatWidget extends HTMLElement {
       return;
     }
 
-    this.t = resolveTranslations(
+    this.t = await resolveTranslations(
       this.getAttribute("lang") || "en",
       this.getAttribute("i18n"),
     );

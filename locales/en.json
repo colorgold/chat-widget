@@ -1,0 +1,16 @@
+{
+  "online": "{count} online",
+  "editNameTitle": "Click to edit name",
+  "emojisTab": "Emojis",
+  "stickersTab": "Stickers",
+  "gifsTab": "GIFs",
+  "searchGifsPlaceholder": "Search GIFs...",
+  "loadingGifs": "Loading GIFs...",
+  "noGifsFound": "No GIFs found.",
+  "gifError": "Could not load GIFs.",
+  "missingGifKey": "Add a giphy-api-key attribute to enable GIF search.",
+  "inputPlaceholder": "Say something...",
+  "sendButton": "Send",
+  "rateLimitAlert": "Please wait a moment before sending another message.",
+  "pickerTitle": "Emojis, Stickers & GIFs"
+}
