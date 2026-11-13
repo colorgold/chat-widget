@@ -5,17 +5,25 @@ export const WIDGET_STYLES = `
     --chat-font: system-ui, -apple-system, sans-serif;
     --chat-bg: #ffffff;
     --chat-border: #cccccc;
-    --chat-radius: 10px;
+    --chat-radius: 0px;
     --chat-header-bg: #222222;
     --chat-header-text: #ffffff;
     --chat-badge-bg: #28a745;
-    --chat-primary: #007bff;
-    --chat-my-msg-bg: var(--chat-primary);
+    --chat-primary: #0070e7;
+    --my-msg-border: #5eacff;
+    --chat-my-msg-bg: #171717;
     --chat-my-msg-text: #ffffff;
-    --chat-other-msg-bg: #f1f1f1;
-    --chat-other-msg-text: #111111;
+    --chat-my-author-text: #5eacff;
+    --chat-my-msg-border: 1px solid var(--my-msg-border);
+    --chat-other-msg-bg: #171717;
+    --chat-other-msg-text: #ffffff;
+    --chat-other-author-text: #02a0b4;
+    --other-msg-border: #02a0b4;
+    --chat-other-msg-border: 1px solid var(--other-msg-border);
     --chat-input-bg: #ffffff;
     --chat-input-text: #111111;
+    --picker-tab-text: #ffffff;
+    --picker-tab-bg: #222222;
     --chat-drawer-bg: #f9f9f9;
 
     display: block;
@@ -81,7 +89,7 @@ export const WIDGET_STYLES = `
   }
   .msg {
     padding: 8px 10px;
-    border-radius: 10px;
+    border-radius: 0px;
     max-width: 80%;
     font-size: 14px;
     word-break: break-word;
@@ -91,7 +99,13 @@ export const WIDGET_STYLES = `
     font-size: 10px;
     opacity: 0.7;
     margin-bottom: 4px;
+    color: var(--chat-other-author-text);
   }
+
+  .msg.me .author {
+    color: var(--chat-my-author-text);
+  }
+
   .media {
     display: block;
     border-radius: 6px;
@@ -104,11 +118,13 @@ export const WIDGET_STYLES = `
   .me {
     background: var(--chat-my-msg-bg);
     color: var(--chat-my-msg-text);
-    align-self: flex-end;
+    /* align-self: flex-end; */
+    border-left: var(--chat-my-msg-border);
   }
   .other {
     background: var(--chat-other-msg-bg);
     color: var(--chat-other-msg-text);
+    border-right: var(--chat-other-msg-border);
     align-self: flex-start;
   }
   #picker-drawer {
@@ -133,14 +149,14 @@ export const WIDGET_STYLES = `
   #picker-tabs {
     display: flex;
     border-bottom: 1px solid var(--chat-border);
-    background: var(--chat-bg);
+    background: var(--picker-tab-bg);
   }
   .tab-btn {
     flex: 1;
     padding: 6px;
     border: none;
     background: transparent;
-    color: var(--chat-input-text);
+    color: var(--picker-tab-text);
     font-size: 12px;
     cursor: pointer;
     opacity: 0.65;
