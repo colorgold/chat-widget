@@ -7,8 +7,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(let e of thi
     --chat-width: 100%;
     --chat-height: 440px;
     --chat-font: system-ui, -apple-system, sans-serif;
-    --chat-bg: #ffffff;
-    --chat-border: #cccccc;
+    --chat-bg: #141414;
+    --chat-border: #3a3a3a;
     --chat-radius: 0px;
     --chat-header-bg: #222222;
     --chat-header-text: #ffffff;
@@ -24,8 +24,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(let e of thi
     --chat-other-author-text: #02a0b4;
     --other-msg-border: #02a0b4;
     --chat-other-msg-border: 1px solid var(--other-msg-border);
-    --chat-input-bg: #ffffff;
-    --chat-input-text: #111111;
+    --chat-input-bg: #222222;
+    --chat-input-text: #ffffff;
     --picker-tab-text: #ffffff;
     --picker-tab-bg: #222222;
     --chat-drawer-bg: #f9f9f9;
@@ -129,7 +129,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(let e of thi
     background: var(--chat-other-msg-bg);
     color: var(--chat-other-msg-text);
     border-right: var(--chat-other-msg-border);
-    align-self: flex-start;
+    /* align-self: flex-start; */
   }
   #picker-drawer {
     display: none;
