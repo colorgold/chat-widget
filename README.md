@@ -3,6 +3,7 @@
 A lightweight, zero-dependency Web Component (`<public-chat-widget>`) for adding real-time public chat rooms to any website. Each site owner connects their own Firebase project, keeping data, billing, and moderation completely isolated.
 
 ## Features
+
 - **Isolated Styles (Shadow DOM):** Never clashes with your website's existing CSS.
 - **Bring Your Own Firebase:** Uses your own Firebase Realtime Database and Anonymous Authentication.
 - **Live Presence Counter:** Displays real-time active users in the room (`onDisconnect`).
@@ -19,37 +20,42 @@ Add the jsDelivr CDN script and the `<public-chat-widget>` tag to your HTML:
 ```html
 <script src="https://jsdelivr.net" defer></script>
 
-<public-chat-widget 
+<public-chat-widget
   room-id="general"
   firebase-config='{
     "apiKey": "YOUR_API_KEY",
     "authDomain": "YOUR_://firebaseapp.com",
     "databaseURL": "https://YOUR_://firebaseio.com",
     "projectId": "YOUR_PROJECT"
-  }'>
+  }'
+>
 </public-chat-widget>
 ```
 
 ---
+
 ## Live Language Switching
+
 - lang: Built-in language code ("en" or "es").
 - i18n: Either a path/URL to a custom .json translation file (e.g., i18n="./locales/fr.json") or an inline JSON string of key overrides
 
 By default the widget has English and Spanish built in. Add the following code:
 
-```window.addEventListener("app:lang-changed", (e) => {
-    const widget = document.querySelector("public-chat-widget");
-    console.log("Language changed to:", e.detail.language);
-    if (widget) {
-      console.log("Updating chat widget language to:", e.detail.language);
-      widget.setAttribute("lang", e.detail.language);
-    }
-  });
+```js
+window.addEventListener("app:lang-changed", (e) => {
+  const widget = document.querySelector("public-chat-widget");
+  console.log("Language changed to:", e.detail.language);
+  if (widget) {
+    console.log("Updating chat widget language to:", e.detail.language);
+    widget.setAttribute("lang", e.detail.language);
+  }
+});
 ```
 
 If you provide "i18n" attribute for your own custom translation file, add this:
 
-```window.addEventListener("app:lang-changed", (e) => {
+```js
+window.addEventListener("app:lang-changed", (e) => {
   const widget = document.querySelector("public-chat-widget");
   if (!widget) return;
 
@@ -64,6 +70,7 @@ If you provide "i18n" attribute for your own custom translation file, add this:
   }
 });
 ```
+
 ## 2. Firebase Setup (Required)
 
 1. Create a free project in the [Firebase Console](https://google.com).
@@ -106,13 +113,13 @@ If you provide "i18n" attribute for your own custom translation file, add this:
 
 ## 3. HTML Attributes
 
-| Attribute | Required | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `firebase-config` | **Yes** | — | JSON string of your Firebase web app config (must include `databaseURL`). |
-| `room-id` | No | `"general"` | Unique identifier for the chat room. |
-| `floating` | No | `false` | Boolean attribute (`<public-chat-widget floating>`) to dock the widget in the bottom-right corner. |
-| `giphy-api-key` | No | — | Your Giphy API key to enable live GIF search. |
-| `stickers` | No | Built-in pack | JSON array of custom HTTPS image URLs for the sticker tab. |
+| Attribute         | Required | Default       | Description                                                                                        |
+| :---------------- | :------- | :------------ | :------------------------------------------------------------------------------------------------- |
+| `firebase-config` | **Yes**  | —             | JSON string of your Firebase web app config (must include `databaseURL`).                          |
+| `room-id`         | No       | `"general"`   | Unique identifier for the chat room.                                                               |
+| `floating`        | No       | `false`       | Boolean attribute (`<public-chat-widget floating>`) to dock the widget in the bottom-right corner. |
+| `giphy-api-key`   | No       | —             | Your Giphy API key to enable live GIF search.                                                      |
+| `stickers`        | No       | Built-in pack | JSON array of custom HTTPS image URLs for the sticker tab.                                         |
 
 ---
 
@@ -133,14 +140,22 @@ public-chat-widget {
   --chat-header-text: #ffffff;
   --chat-badge-bg: #28a745;
 
-  --chat-primary: #007bff;
-  --chat-my-msg-bg: var(--chat-primary);
+  --chat-primary: #0070e7;
+  --my-msg-border: #5eacff;
+  --chat-my-msg-bg: #171717;
   --chat-my-msg-text: #ffffff;
+  --chat-my-author-text: #5eacff;
+  --chat-my-msg-border: 1px solid var(--my-msg-border);
   --chat-other-msg-bg: #f1f1f1;
   --chat-other-msg-text: #111111;
+  --chat-other-author-text: #02a0b4;
+  --other-msg-border: #02a0b4;
+  --chat-other-msg-border: 1px solid var(--other-msg-border);
 
   --chat-input-bg: #ffffff;
   --chat-input-text: #111111;
+  --picker-tab-text: #ffffff;
+  --picker-tab-bg: #222222;
   --chat-drawer-bg: #f9f9f9;
 }
 ```
